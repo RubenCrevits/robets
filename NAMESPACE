@@ -1,0 +1,14 @@
+useDynLib(robets)
+import(forecast)
+import(Rcpp)
+importFrom("graphics", "plot")
+importFrom("stats", "as.ts", "decompose", "fitted", "frequency",
+             "lsfit", "mad", "median", "na.contiguous", "na.omit",
+             "qnorm", "residuals", "ts", "tsp", "tsp<-")
+S3method(coef,robets)
+S3method(forecast,robets)
+S3method(print,robets)
+S3method(summary,robets)
+S3method(plot,robets)
+export(tau2)
+export(robets,forecast.robets)
