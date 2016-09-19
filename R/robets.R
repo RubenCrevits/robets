@@ -26,9 +26,9 @@
 #' @param ... Other undocumented arguments.
 #' @return An object of class "\code{robets}".
 #' @details The methodology is fully automatic. The only required argument for robets is the time series. The model is chosen automatically if not specified.
-#' @examples 
+#' @examples
 #' library(forecast)
-#' model = robets(USAccDeaths)
+#' model <- robets(USAccDeaths)
 #' plot(forecast(model))
 #' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
 #' @references Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
@@ -40,7 +40,7 @@ robets <- function(y, model="ZZZ", damped=NULL,
                 lower=c(rep(0.0001,3), 0.8), upper=c(rep(0.9999,3),0.98),
                 opt.crit=c("tau2","roblik","lik","mse","amse","sigma","mae"), bounds=c("both","usual","admissible"),
                 ic=c("robaicc","robaic","robbic","aicc","bic","aic"), 
-                use.initial.values=FALSE,opt.initial.values=TRUE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=2,nmse=1,...)
+                use.initial.values=FALSE,opt.initial.values=FALSE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=2,nmse=1,...)
 {
   
   #dataname <- substitute(y)
@@ -803,7 +803,9 @@ initstatebounds <- function(y,errortype,trendtype,seasontype){
 #' Print robets model
 #'
 #' @param x An object of class \code{robets}.
-#' 
+#' @examples
+#' model <- robets(USAccDeaths)
+#' print(model)
 #' @export
 print.robets <- function(x,...)
 {
@@ -869,7 +871,11 @@ print.robets <- function(x,...)
 #' @return The tau2 estimate of scale.
 #' @description The tau2-estimator is a robust measure of the scale. The exact formula of the estimator is in Gelper et al. (2010), equation 16.
 #' @references Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
-#' 
+#' @examples
+#' set.seed(100)
+#' e <- 10*rnorm(100)
+#' mse <- mean(e^2) 
+#' tse <- tau2(e) 
 #' @export
 tau2 = function(x){
   .Call('robets_tau2', PACKAGE = 'robets', x)
@@ -884,6 +890,9 @@ tau2 = function(x){
 #' @param ... Other plotting parameters.
 #' @method plot robets
 #'
+#' @examples
+#' model = robets(USAccDeaths)
+#' plot(model)
 #' @seealso \code{\link{plot.ets}}
 #' @export
 plot.robets <- function(x,...)
@@ -919,8 +928,12 @@ plot.robets <- function(x,...)
 #' 
 #' @param object An object of class \code{robets}.
 #' 
-#' @return 
+#' 
+#' @return A number of training set error measures: ME (mean error), RMSE (root mean squared error), MAE (mean absolute error), MPE (mean percentage error), MAPE (mean absolute percentage error), MedianE (median error), RTSE (root tau squared error), RTSPE (root tau squared percentage error).
 #'
+#' @examples
+#' model = robets(USAccDeaths)
+#' summary(model)
 #' @export
 summary.robets <- function(object,...)
 {
@@ -934,6 +947,7 @@ summary.robets <- function(object,...)
   errors <- c(me, sqrt(mse), mae, mpe, mape)
   names(errors) <- c("ME", "RMSE", "MAE", "MPE", "MAPE")
   
+  print(object)
   cat("Training set: non robust error measures: \n")
   print(errors)
   
@@ -941,15 +955,20 @@ summary.robets <- function(object,...)
   me <- median(res,na.rm=TRUE)
   t2 <- tau2(res)
   t2p <- tau2(pe)
-  errors <- c(me, t2, t2p)
-  names(errors) <- c("MedianE", "Tau2", "Tau2P")
+  errorsr <- c(me, t2, t2p)
+  names(errorsr) <- c("MedianE", "RTSE", "RTSPE")
+  print(errorsr)
+  
+  return(c(errors,errorsr))
 }
 
 #' Coef robets model
 #' 
 #' @param object An object of class \code{robets}.
-#' @param ... Other undocumented arguments.
 #'
+#' @examples 
+#' model = robets(USAccDeaths)
+#' coef(model)
 #' @export
 coef.robets <- function(object,...)
 {

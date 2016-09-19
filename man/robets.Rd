@@ -10,7 +10,7 @@ robets(y, model = "ZZZ", damped = NULL, alpha = NULL, beta = NULL,
   opt.crit = c("tau2", "roblik", "lik", "mse", "amse", "sigma", "mae"),
   bounds = c("both", "usual", "admissible"), ic = c("robaicc", "robaic",
   "robbic", "aicc", "bic", "aic"), use.initial.values = FALSE,
-  opt.initial.values = TRUE, rob.start.initial.values = TRUE,
+  opt.initial.values = FALSE, rob.start.initial.values = TRUE,
   opt.sigma0 = FALSE, k = 2, nmse = 1, ...)
 }
 \arguments{
@@ -67,7 +67,7 @@ The methodology is fully automatic. The only required argument for robets is the
 }
 \examples{
 library(forecast)
-model = robets(USAccDeaths)
+model <- robets(USAccDeaths)
 plot(forecast(model))
 }
 \author{

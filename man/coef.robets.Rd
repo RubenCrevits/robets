@@ -8,10 +8,12 @@
 }
 \arguments{
 \item{object}{An object of class \code{robets}.}
-
-\item{...}{Other undocumented arguments.}
 }
 \description{
 Coef robets model
+}
+\examples{
+model = robets(USAccDeaths)
+coef(model)
 }
 

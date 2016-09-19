@@ -8,10 +8,15 @@
 }
 \arguments{
 \item{object}{An object of class \code{robets}.}
-
-\item{...}{Other undocumented arguments.}
+}
+\value{
+A number of training set error measures: ME (mean error), RMSE (root mean squared error), MAE (mean absolute error), MPE (mean percentage error), MAPE (mean absolute percentage error), MedianE (median error), RTSE (root tau squared error), RTSPE (root tau squared percentage error).
 }
 \description{
 Summary robets model
+}
+\examples{
+model = robets(USAccDeaths)
+summary(model)
 }
 

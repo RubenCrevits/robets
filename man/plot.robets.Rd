@@ -14,6 +14,10 @@
 \description{
 Plot robets model
 }
+\examples{
+model = robets(USAccDeaths)
+plot(model)
+}
 \seealso{
 \code{\link{plot.ets}}
 }
