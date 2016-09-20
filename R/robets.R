@@ -267,7 +267,9 @@ robets <- function(y, model="ZZZ", damped=NULL,
   }
   
   if(is.null(k)) k <- model$par["k"]
-  model$outlier <- abs(model$residuals)/switch(model$components[1],A=1,M=model$fitted) > k*model$states[2:nrow(model$states),1]
+  sigmas <- model$states[2:nrow(model$states),1]
+  model$outlyingness <- model$residuals/sigmas 
+  model$outlier <-  abs(model$outlyingness) > k
   model$outlier <- ts(model$outlier, frequency = tsp(y)[3], start = tsp(y)[1])
   #model$call$data <- dataname
   
@@ -609,81 +611,83 @@ initparam <- function(alpha,beta,gamma,phi,trendtype,seasontype,damped,lower,upp
   return(par)
 }
 
-robinitstate <-  function(y,errortype,trendtype,seasontype)
+robinitstate <-  function(y, errortype, trendtype, seasontype)
 {
   m <- frequency(y)
   n <- length(y)
-  startup <- min(max(ceiling(10/m)*m,5*m),floor(length(y)/m)*m)
-  if(n < 2*m)
+  startup <- min(max(ceiling(10 / m) * m, 5 * m), floor(length(y) / m) * m)
+  if (n < 2 * m)
     stop("Not enough data: need at least three periods.")
-  
-  if(trendtype=="N"){
+
+  if (trendtype == "N") {
     l0 <- median(y[1:startup])
     b0 <- NULL
     ydt <- l0
-  }else{ # trendtype = "A" 
-    fit <- myrm(y[1:startup]) # Repeated median 
-      l0 <- fit$level
-      b0 <- fit$slope
-      # If error type is "M", then we don't want l0+b0=0.
-      # So perturb just in case.
-      if(abs(l0+b0) < 1e-8){
-        l0 <- l0*(1+1e-3)
-        b0 <- b0*(1-1e-3)
-      }
-      ydt = l0 + (1:startup)*b0
+  } else{
+    # trendtype = "A"
+    fit <- myrm(y[1:startup]) # Repeated median
+    l0 <- fit$level
+    b0 <- fit$slope
+    # If error type is "M", then we don't want l0+b0=0.
+    # So perturb just in case.
+    if (abs(l0 + b0) < 1e-8) {
+      l0 <- l0 * (1 + 1e-3)
+      b0 <- b0 * (1 - 1e-3)
+    }
+    ydt = l0 + (1:startup) * b0
   }
-  
-  if(seasontype!="N")
+
+  if (seasontype != "N")
   {
     # Seasonally adjusted data
-    if(seasontype=="A"){
-      init.seas <- rowMedians(matrix(y[1:startup]-ydt,nrow=m))
-      if(errortype == "A")
-        sigma0 <- mad(y[1:startup]-ydt-init.seas)
-      else # if errortype = "M"
-        sigma0 <- mad((y[1:startup]-ydt-init.seas)/(ydt-init.seas))
-    }else{
-      init.seas <- rowMedians(matrix(y[1:startup]/ydt,nrow=m))
-      init.seas <- pmax(init.seas, 1e-2) # We do not want negative seasonal indexes
-      if(errortype == "A")
-        sigma0 <- mad(y[1:startup]-ydt/init.seas)
-      else # if errortype = "M"
-        sigma0 <- mad((y[1:startup]-ydt/init.seas)/(ydt/init.seas))
+    if (seasontype == "A") {
+      init.seas <- rowMedians(matrix(y[1:startup] - ydt, nrow = m))
+      if (errortype == "A")
+        sigma0 <- mad(y[1:startup] - ydt - init.seas)
+      else
+        # if errortype = "M"
+        sigma0 <- mad((y[1:startup] - ydt - init.seas) / (ydt - init.seas))
+    } else{
+      init.seas <- rowMedians(matrix(y[1:startup] / ydt, nrow = m))
+      init.seas <-
+        pmax(init.seas, 1e-2) # We do not want negative seasonal indexes
+      if (errortype == "A")
+        sigma0 <- mad(y[1:startup] - ydt / init.seas)
+      else
+        # if errortype = "M"
+        sigma0 <- mad((y[1:startup] - ydt / init.seas) / (ydt / init.seas))
     }
-    
+
     init.seas = rev(init.seas) # reverse to match convention in ETS
-    names(init.seas) <- paste("s",0:(m-1),sep="")
-    
-    if(seasontype=="A"){
+    names(init.seas) <- paste("s", 0:(m - 1), sep = "")
+
+    if (seasontype == "A") {
       l0 = l0 + mean(init.seas)
-      init.seas = init.seas[1:(m-1)] - mean(init.seas)
+      init.seas = init.seas[1:(m - 1)] - mean(init.seas)
     }
-    if(seasontype=="M"){
+    if (seasontype == "M") {
       me = mean(init.seas)
       l0 = l0 * me
-      init.seas = init.seas[1:(m-1)] / me
+      init.seas = init.seas[1:(m - 1)] / me
     }
-  }else # non-seasonal model
+  } else
+    # non-seasonal model
   {
     m <- 1
     init.seas <- NULL
-    if(errortype == "A")
-      sigma0 <- mad(y[1:startup]-ydt)
-    else # if errortype = "M"
-      sigma0 <- mad((y[1:startup]-ydt)/ydt)
+    if (errortype == "A")
+      sigma0 <- mad(y[1:startup] - ydt)
+    else
+      # if errortype = "M"
+      sigma0 <- mad((y[1:startup] - ydt) / ydt)
   }
-
-  
 
   names(l0) <- "l"
   if(!is.null(b0))
     names(b0) <- "b"
   names(sigma0) <- "sigma0"
 
-
   return(c(sigma0,l0,b0,init.seas))
-#   c((errortype=="A")*1 + (errortype=="M")*0.01,initstate2(y,trendtype,seasontype))
 }
 
 initstate2 <- function(y,errortype,trendtype,seasontype)
@@ -893,7 +897,7 @@ tau2 = function(x){
 #' @examples
 #' model = robets(USAccDeaths)
 #' plot(model)
-#' @seealso \code{\link{plot.ets}}
+#' @seealso \code{\link{plotOultiers}, \link{plot.ets}}
 #' @export
 plot.robets <- function(x,...)
 {
@@ -1079,6 +1083,38 @@ check.param <- function(alpha,beta,gamma,phi,lower,upper,bounds,m)
       return(0)
   }
   return(1)
+}
+
+#' Plot outliers detected by robets model
+#' 
+#' @param object An object of class \code{robets}.
+#' @param ... Other plotting parameters.
+#'
+#' @examples
+#' model = robets(USAccDeaths)
+#' plotOutliers(model)
+#' @seealso \code{\link{plot.robets}}
+#' @export
+plotOutliers <- function(object, xlab="", ylab="", type="l",...) {
+  y <- object$x
+  ny <- length(y)
+  y2 <- na.contiguous(y)
+  if(ny != length(y2))
+    warning("Missing values encountered. Using longest contiguous portion of time series, just as in robets.")
+  y <- as.ts(y2)
+  n <- length(y)
+  plot(y, xlab = xlab, ylab = ylab, type = type, main=paste("Outlier etection with", object$method,"method"), ...)
+  
+  m <- frequency(y)
+  srt <- start(y)
+  
+  for( t in 1:n){
+    if(object$outlier[t]){
+      points(srt[1]+(t-1+srt[2]-1)/m, y[t],col="red",pch = 19)
+    }
+  }
+  
+  if(sum(object$outlier) == 0) message("No outliers detected.")
 }
 
 # Repeated Median

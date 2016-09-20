@@ -19,6 +19,6 @@ model = robets(USAccDeaths)
 plot(model)
 }
 \seealso{
-\code{\link{plot.ets}}
+\code{\link{plotOultiers}, \link{plot.ets}}
 }
 
