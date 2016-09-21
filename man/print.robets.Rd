@@ -8,12 +8,14 @@
 }
 \arguments{
 \item{x}{An object of class \code{robets}.}
+
+\item{...}{Other undocumented arguments.}
 }
 \description{
 Print robets model
 }
 \examples{
-model <- robets(USAccDeaths)
+model <- robets(nottem)
 print(model)
 }
 

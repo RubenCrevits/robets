@@ -636,7 +636,7 @@ double EtsTargetFunction::median(std::vector<double> x) {
 
 double EtsTargetFunction::computeTau2(std::vector<double>& x){
   // compute Erho
-  const double kt = 2.0;//2.0;
+  const double kt = 3.0;//2.0;
   const double dnormk = exp(-kt*kt/2.0)/sqrt(2.0*M_PI);
   const double pnormk = 0.5*erfc(-kt/sqrt(2.0));
   const double d1 = pnormk-0.5-kt*dnormk;

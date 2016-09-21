@@ -10,16 +10,16 @@
 #' @param ... Other arguments.
 #' @return An object of class "\code{forecast}". The function \code{summary} is used to obtain and print a summary of the results, while the function \code{plot} produces a plot of the forecasts. The generic accessor functions \code{fitted.values} and \code{residuals} extract useful features of the value returned by \code{forecast.robets}. An object of class \code{"forecast"} is a list containing at least the following elements:
 #' \itemize{
-#' \item{model}{A list containing information about the fitted model}
-#' \item{method}{The name of the forecasting method as a character string}
-#' \item{mean}{Point forecasts as a time series}
-#' \item{x}{The original time series (either \code{object} itself or the time series used to create the model stored as \code{object}).}
-#' \item{residuals}{Residuals from the fitted model. For models with additive errors, the residuals are x - fitted values. For models with multiplicative errors, the residuals are equal to x /(fitted values) - 1.}
-#' \item{fitted}{Fitted values (one-step forecasts)}
+#' \item{model: }{A list containing information about the fitted model}
+#' \item{method: }{The name of the forecasting method as a character string}
+#' \item{mean: }{Point forecasts as a time series}
+#' \item{x: }{The original time series (either \code{object} itself or the time series used to create the model stored as \code{object}).}
+#' \item{residuals: }{Residuals from the fitted model. For models with additive errors, the residuals are x - fitted values. For models with multiplicative errors, the residuals are equal to x /(fitted values) - 1.}
+#' \item{fitted: }{Fitted values (one-step ahead forecasts)}
 #' }
 #' @examples 
 #' library(forecast)
-#' model = robets(USAccDeaths)
+#' model <- robets(nottem)
 #' plot(forecast(model))
 #' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
 #' @author Ruben Crevits, \email{ruben.crevits@@kuleuven.be}

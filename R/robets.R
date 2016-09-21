@@ -28,9 +28,10 @@
 #' @details The methodology is fully automatic. The only required argument for robets is the time series. The model is chosen automatically if not specified.
 #' @examples
 #' library(forecast)
-#' model <- robets(USAccDeaths)
+#' model <- robets(nottem)
 #' plot(forecast(model))
 #' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
+#' @references Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
 #' @references Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
 #' @author Ruben Crevits, \email{ruben.crevits@@kuleuven.be}
 #' @seealso \code{\link{forecast.robets}, \link{plot.robets}, \link{tau2}, \link{ets}}
@@ -40,7 +41,7 @@ robets <- function(y, model="ZZZ", damped=NULL,
                 lower=c(rep(0.0001,3), 0.8), upper=c(rep(0.9999,3),0.98),
                 opt.crit=c("tau2","roblik","lik","mse","amse","sigma","mae"), bounds=c("both","usual","admissible"),
                 ic=c("robaicc","robaic","robbic","aicc","bic","aic"), 
-                use.initial.values=FALSE,opt.initial.values=FALSE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=2,nmse=1,...)
+                use.initial.values=FALSE,opt.initial.values=FALSE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=3,nmse=1,...)
 {
   
   #dataname <- substitute(y)
@@ -269,8 +270,8 @@ robets <- function(y, model="ZZZ", damped=NULL,
   if(is.null(k)) k <- model$par["k"]
   sigmas <- model$states[2:nrow(model$states),1]
   model$outlyingness <- model$residuals/sigmas 
-  model$outlier <-  abs(model$outlyingness) > k
-  model$outlier <- ts(model$outlier, frequency = tsp(y)[3], start = tsp(y)[1])
+  model$outliers <-  abs(model$outlyingness) > k
+  model$outliers <- ts(model$outlier, frequency = tsp(y)[3], start = tsp(y)[1])
   #model$call$data <- dataname
   
   return(structure(model,class="robets"))
@@ -807,11 +808,13 @@ initstatebounds <- function(y,errortype,trendtype,seasontype){
 #' Print robets model
 #'
 #' @param x An object of class \code{robets}.
+#' @param ... Other undocumented arguments.
+#' 
 #' @examples
-#' model <- robets(USAccDeaths)
+#' model <- robets(nottem)
 #' print(model)
 #' @export
-print.robets <- function(x,...)
+print.robets <- function(x, ...)
 {
   cat(paste(x$method, "\n\n"))
   cat(paste("Call:\n", deparse(x$call), "\n\n"))
@@ -873,8 +876,9 @@ print.robets <- function(x,...)
 #'
 #' @param x A vector of residuals.
 #' @return The tau2 estimate of scale.
-#' @description The tau2-estimator is a robust measure of the scale. The exact formula of the estimator is in Gelper et al. (2010), equation 16.
-#' @references Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
+#' @description The tau2-estimator is a robust measure of the scale. The exact formula of the estimator is in Crevits and Croux (2016), equation 3.10.
+#' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
+#' 
 #' @examples
 #' set.seed(100)
 #' e <- 10*rnorm(100)
@@ -895,9 +899,9 @@ tau2 = function(x){
 #' @method plot robets
 #'
 #' @examples
-#' model = robets(USAccDeaths)
+#' model <- robets(nottem)
 #' plot(model)
-#' @seealso \code{\link{plotOultiers}, \link{plot.ets}}
+#' @seealso \code{\link{plotOutliers}, \link{plot.ets}}
 #' @export
 plot.robets <- function(x,...)
 {
@@ -931,15 +935,15 @@ plot.robets <- function(x,...)
 #' Summary robets model
 #' 
 #' @param object An object of class \code{robets}.
-#' 
+#' @param ... Other undocumented arguments.
 #' 
 #' @return A number of training set error measures: ME (mean error), RMSE (root mean squared error), MAE (mean absolute error), MPE (mean percentage error), MAPE (mean absolute percentage error), MedianE (median error), RTSE (root tau squared error), RTSPE (root tau squared percentage error).
 #'
 #' @examples
-#' model = robets(USAccDeaths)
+#' model = robets(nottem)
 #' summary(model)
 #' @export
-summary.robets <- function(object,...)
+summary.robets <- function(object, ...)
 {
   res <- object$x - object$fitted # one step ahead prediction errors, in sample
   pe <- res/object$fitted * 100
@@ -969,17 +973,18 @@ summary.robets <- function(object,...)
 #' Coef robets model
 #' 
 #' @param object An object of class \code{robets}.
+#' @param ... Other undocumented arguments.
 #'
 #' @examples 
-#' model = robets(USAccDeaths)
+#' model <- robets(nottem)
 #' coef(model)
 #' @export
-coef.robets <- function(object,...)
+coef.robets <- function(object, ...)
 {
   object$par
 }
 
-logLik.robets <- function(object,...)
+logLik.robets <- function(object)
 {
   structure(object$loglik,df=length(object$par),class="logLik")
 }
@@ -1088,14 +1093,17 @@ check.param <- function(alpha,beta,gamma,phi,lower,upper,bounds,m)
 #' Plot outliers detected by robets model
 #' 
 #' @param object An object of class \code{robets}.
+#' @param xlab Label of the x-axis.
+#' @param ylab Label of the y-asix.
+#' @param type Character indicating the type of plot, just as in \code{plot}.
 #' @param ... Other plotting parameters.
 #'
 #' @examples
-#' model = robets(USAccDeaths)
+#' model <- robets(nottem)
 #' plotOutliers(model)
 #' @seealso \code{\link{plot.robets}}
 #' @export
-plotOutliers <- function(object, xlab="", ylab="", type="l",...) {
+plotOutliers <- function(object, xlab="", ylab="", type="l", ...) {
   y <- object$x
   ny <- length(y)
   y2 <- na.contiguous(y)
@@ -1103,7 +1111,7 @@ plotOutliers <- function(object, xlab="", ylab="", type="l",...) {
     warning("Missing values encountered. Using longest contiguous portion of time series, just as in robets.")
   y <- as.ts(y2)
   n <- length(y)
-  plot(y, xlab = xlab, ylab = ylab, type = type, main=paste("Outlier etection with", object$method,"method"), ...)
+  plot(y, xlab = xlab, ylab = ylab, type = type, main=paste("Outlier detection with", object$method,"method"), ...)
   
   m <- frequency(y)
   srt <- start(y)

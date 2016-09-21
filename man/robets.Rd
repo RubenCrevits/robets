@@ -11,7 +11,7 @@ robets(y, model = "ZZZ", damped = NULL, alpha = NULL, beta = NULL,
   bounds = c("both", "usual", "admissible"), ic = c("robaicc", "robaic",
   "robbic", "aicc", "bic", "aic"), use.initial.values = FALSE,
   opt.initial.values = FALSE, rob.start.initial.values = TRUE,
-  opt.sigma0 = FALSE, k = 2, nmse = 1, ...)
+  opt.sigma0 = FALSE, k = 3, nmse = 1, ...)
 }
 \arguments{
 \item{y}{a numeric vector or time series}
@@ -67,7 +67,7 @@ The methodology is fully automatic. The only required argument for robets is the
 }
 \examples{
 library(forecast)
-model <- robets(USAccDeaths)
+model <- robets(nottem)
 plot(forecast(model))
 }
 \author{
@@ -75,6 +75,8 @@ Ruben Crevits, \email{ruben.crevits@kuleuven.be}
 }
 \references{
 Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
+
+Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
 
 Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
 }

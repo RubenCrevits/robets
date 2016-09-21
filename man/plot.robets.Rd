@@ -15,10 +15,10 @@
 Plot robets model
 }
 \examples{
-model = robets(USAccDeaths)
+model <- robets(nottem)
 plot(model)
 }
 \seealso{
-\code{\link{plotOultiers}, \link{plot.ets}}
+\code{\link{plotOutliers}, \link{plot.ets}}
 }
 

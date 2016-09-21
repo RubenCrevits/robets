@@ -9,13 +9,19 @@ plotOutliers(object, xlab = "", ylab = "", type = "l", ...)
 \arguments{
 \item{object}{An object of class \code{robets}.}
 
+\item{xlab}{Label of the x-axis.}
+
+\item{ylab}{Label of the y-asix.}
+
+\item{type}{Character indicating the type of plot, just as in \code{plot}.}
+
 \item{...}{Other plotting parameters.}
 }
 \description{
 Plot outliers detected by robets model
 }
 \examples{
-model = robets(USAccDeaths)
+model <- robets(nottem)
 plotOutliers(model)
 }
 \seealso{

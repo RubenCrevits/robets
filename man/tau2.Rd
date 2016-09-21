@@ -13,7 +13,7 @@ tau2(x)
 The tau2 estimate of scale.
 }
 \description{
-The tau2-estimator is a robust measure of the scale. The exact formula of the estimator is in Gelper et al. (2010), equation 16.
+The tau2-estimator is a robust measure of the scale. The exact formula of the estimator is in Crevits and Croux (2016), equation 3.10.
 }
 \examples{
 set.seed(100)
@@ -22,6 +22,6 @@ mse <- mean(e^2)
 tse <- tau2(e) 
 }
 \references{
-Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
+Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
 }
 
