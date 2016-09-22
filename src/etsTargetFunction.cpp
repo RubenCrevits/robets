@@ -49,7 +49,7 @@ void EtsTargetFunction::init(std::vector<double> & p_y, int p_errortype,
   
   this->sigma0 = p_sigma0;
   this->initstate = p_initstate;
-  if(initstate.size() < nstate ){
+  if(initstate.size() < (unsigned) nstate ){
     if(seasontype != NONE) {
   		double sum=0;
   		for(int i=0;i<(m-1);i++) {
@@ -87,7 +87,7 @@ void EtsTargetFunction::eval(const double* p_par, int p_par_length) {
 	bool equal=true;
   
 	// Check if the parameter configuration has changed, if not, just return.
-	if(p_par_length != this->par.size()) {
+	if((unsigned)p_par_length != this->par.size()) {
 		equal=false;
 	} else {
 		for(int j=0;j < p_par_length;j++) {
@@ -128,16 +128,16 @@ void EtsTargetFunction::eval(const double* p_par, int p_par_length) {
   } 
   
   if(givenInit){
-    for(int i=0; i < initstate.size(); i++) {
+    for(unsigned i=0; i < initstate.size(); i++) {
       this->state.push_back(initstate[i]);
     }
   }
   
-  if(state.size() < nstate ){
+  if(state.size() < (unsigned) nstate ){
     if(seasontype != NONE) {
       double sum=0;
     
-    	for(int i=(2+((trendtype != NONE) ? 1 : 0));i<state.size();i++) {
+    	for(unsigned i=(2+((trendtype != NONE) ? 1 : 0));i<state.size();i++) {
     		sum += state[i];
     	}
     
@@ -300,7 +300,7 @@ bool EtsTargetFunction::admissible() {
 		cpolyroot(&opr[0], &opi[0], &degree, &zeror[0], &zeroi[0], &fail);
 
 		double max = 0;
-		for(int i=0;i<zeror.size();i++) {
+		for(unsigned i=0;i<zeror.size();i++) {
 		  double abs_val = sqrt(zeror[i]*zeror[i] + zeroi[i]*zeroi[i]);
 		  if(abs_val>max) max = abs_val;
 		}
@@ -578,15 +578,15 @@ void EtsTargetFunction::oneEval(std::vector<double> & p_y, int p_errortype,
 
 	this->state.clear();
 
-	for(int i=0; i < initstate.size(); i++) {
+	for(unsigned i=0; i < initstate.size(); i++) {
     this->state.push_back(initstate[i]);
 	}
   
-  if(state.size() < nstate ){
+  if(state.size() < (unsigned)nstate ){
     if(seasontype != NONE) {
       double sum=0;
   
-    	for(int i=(2+((trendtype != NONE) ? 1 : 0));i<state.size();i++) {
+    	for(unsigned i=(2+((trendtype != NONE) ? 1 : 0));i<state.size();i++) {
     		sum += state[i];
     	}
     
@@ -596,7 +596,7 @@ void EtsTargetFunction::oneEval(std::vector<double> & p_y, int p_errortype,
     }
   }
 
-  for(int i=0; i < nstate*this->y.size(); i++) state.push_back(0);    
+  for(unsigned i=0; i < nstate*this->y.size(); i++) state.push_back(0);    
   etscalc();
 }
 
@@ -645,13 +645,13 @@ double EtsTargetFunction::computeTau2(std::vector<double>& x){
   const double Erho = (6.0/pow(kt,2))*d1 - (6.0/pow(kt,4))*d2 + (2.0/pow(kt,6))*d3 + 2.0*(1.0-pnormk);
   
   std::vector<double> x2;
-  for(int i = 0 ; i<x.size() ; ++i){
+  for(unsigned i = 0 ; i<x.size() ; ++i){
     x2.push_back(x[i]*x[i]);
   }
   double sc = 1.482602*sqrt(median(x2));
   double tauscale = 0.0;
   double rho;
-  for(int i = 0 ; i < x.size() ; ++i){
+  for(unsigned i = 0 ; i < x.size() ; ++i){
     rho = 1.0;
     if(std::abs(x[i]/sc)<kt){
       rho = 1.0-pow((1.0-pow((x[i]/sc)/kt,2)),3);
