@@ -4,7 +4,7 @@
 #' Returns robets model applied to \code{y}.
 #' 
 #' @param y a numeric vector or time series
-#' @param model A three-letter string indicating the method using the framework terminology of Hyndman et al. (2008). The first letter denotes the error type ("A", "M" or "Z"); the second letter denotes the trend type ("N","A","M" or "Z"); and the third letter denotes the season type ("N","A","M" or "Z"). In all cases, "N"=none, "A"=additive, "M"=multiplicative and "Z"=automatically selected. So, for example, "ANN" is simple exponential  smoothing with additive errors, "MAM" is multiplicative Holt-Winters' method with multiplicative errors, and so on. It is also possible for the model to be of class "\code{robets}", and equal to the output from a previous call to \code{robets}. In this case, the same model is fitted to \code{y} without re-estimating any smoothing parameters. See also the \code{use.initial.values} argument.
+#' @param model A three-letter string indicating the method using the framework terminology of Hyndman et al. (2008). The first letter denotes the error type ("A", "M" or "Z"); the second letter denotes the trend type ("N","A" or "Z"); and the third letter denotes the season type ("N","A","M" or "Z"). In all cases, "N"=none, "A"=additive, "M"=multiplicative and "Z"=automatically selected. So, for example, "ANN" is simple exponential  smoothing with additive errors, "MAM" is multiplicative Holt-Winters' method with multiplicative errors, and so on. It is also possible for the model to be of class "\code{robets}", and equal to the output from a previous call to \code{robets}. In this case, the same model is fitted to \code{y} without re-estimating any smoothing parameters. See also the \code{use.initial.values} argument.
 #' @param damped If TRUE, use a damped trend. If NULL, both damped and non-damped trends will be tried and the best model (according to the information criterion \code{ic}) will be returned.
 #' @param alpha Value of alpha. If NULL, it is estimated.
 #' @param beta Value of beta. If NULL, it is estimated.
@@ -18,23 +18,23 @@
 #' @param bounds Type of parameter space to impose: \code{"usual"} indicates all parameters must lie between specified lower and upper bounds; \code{"admissible"} indicates parameters must lie in the admissible space; \code{"both"} (default) takes the intersection of these regions.
 #' @param ic Information criterion to be used in model selection.
 #' @param use.initial.values If \code{TRUE} and \code{model} is of class \code{"robets"}, then the initial values in the model are also not re-estimated.
-#' @param opt.initial.values If \code{TRUE} (default) the initial values are part of the problem to optimize \code{opt.crit}. If \code{FALSE} a robust heuristic is used for chosing the initial values. Neglected if \code{use.initial.values} is \code{TRUE} and \code{model} is of class \code{"robets"}.
+#' @param opt.initial.values If \code{FALSE} (default) a robust heuristic is used for chosing the initial values. If \code{TRUE}  the initial values are part of the problem to optimize \code{opt.crit}.  Neglected if \code{use.initial.values} is \code{TRUE} and \code{model} is of class \code{"robets"}.
 #' @param rob.start.initial.values If \code{TRUE} (default) the initial values are computed via the robust heuristic described in Crevits and Croux (2016). If \code{FALSE} the initial values are computed via the same heuristic as in Hyndman et al. (2008). The initial values computed with these methods are further optimized if \code{opt.initial.values} is \code{TRUE}.
-#' @param opt.sigma0 If \code{FALSE} (default) sigma0 is equal to the value computed together with the other initial values via a heuristic. If \code{TRUE} sigma0 is included as a variable in the optimization problem.
-#' @param k Value of k in forecasting equations. If NULL, it is estimated, \code{k=2} is default.
+#' @param opt.sigma0 If \code{FALSE} (default) sigma0 is equal to the value computed together with the other initial values via a heuristic. If \code{TRUE} sigma0 is included as a variable in the optimization problem. It is not recommended to set \code{opt.sigma0 = TRUE}.
+#' @param k Value of k in forecasting equations. \code{k=3} is default. If NULL, \code{k} is included as a variable in the optimization problem. It is not recommended to set \code{k = NULL}.
 #' @param nmse Number of steps for AMSE (1<=\code{nmse}<=30), \code{nmse=1} is default.
 #' @param ... Other undocumented arguments.
 #' @return An object of class "\code{robets}".
-#' @details The methodology is fully automatic. The only required argument for robets is the time series. The model is chosen automatically if not specified.
+#' @details The code is an extended version of the code of the function \code{ets} of the package \code{forecast} of Hyndman and Khandakar (2008). The methodology is an extended version of Gelper et al. (2008). In Crevits and Croux (2016) the methodology of \code{robets} is described in full (\url{https://rcrevits.wordpress.com/research}).
 #' @examples
 #' library(forecast)
 #' model <- robets(nottem)
 #' plot(forecast(model))
-#' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
+#' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}. 
 #' @references Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
 #' @references Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
 #' @author Ruben Crevits, \email{ruben.crevits@@kuleuven.be}
-#' @seealso \code{\link{forecast.robets}, \link{plot.robets}, \link{tau2}, \link{ets}}
+#' @seealso \code{\link{forecast.robets}, \link{plot.robets}, \link{plotOutliers}, \link{tau2}, \link{ets}}
 #' @export
 robets <- function(y, model="ZZZ", damped=NULL,
                 alpha=NULL, beta=NULL, gamma=NULL, phi=NULL, additive.only=FALSE, lambda=NULL,
@@ -277,8 +277,6 @@ robets <- function(y, model="ZZZ", damped=NULL,
   return(structure(model,class="robets"))
 }
 
-
-
 robpegelsresid.C <- function(y,m,initstate,errortype,trendtype,seasontype,damped,alpha,beta,gamma,phi,nmse,k)
 {
   if(!damped){
@@ -291,7 +289,7 @@ robpegelsresid.C <- function(y,m,initstate,errortype,trendtype,seasontype,damped
     gamma <- 0;
   }
   
-  res = .Call("robets_calc_out",y,m,initstate,switch(errortype,"A"=1,"M"=2), switch(trendtype,"N"=0,"A"=1,"M"=2), switch(seasontype,"N"=0,"A"=1,"M"=2),damped,alpha,beta,gamma,phi,nmse,k,package="robets")
+  res <- .Call("robets_calc_out",y,m,initstate,switch(errortype,"A"=1,"M"=2), switch(trendtype,"N"=0,"A"=1,"M"=2), switch(seasontype,"N"=0,"A"=1,"M"=2),damped,alpha,beta,gamma,phi,nmse,k,package="robets")
   if(!is.na(res$lik)){
     if(abs(res$lik+99999) < 1e-7)
       res$lik <- NA
@@ -349,9 +347,9 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
     initval <- initstate2(y,errortype,trendtype,seasontype) 
   }
   
-  sigma0 = initval[1]
-  names(sigma0) = "sigma0"
-  initstate = initval[2:length(initval)]
+  sigma0 <- initval[1]
+  names(sigma0) <- "sigma0"
+  initstate <- initval[2:length(initval)]
   if(opt.sigma0){
     par <- c(par,sigma0)
     lower <- c(lower,sigma0 = 0)
@@ -361,7 +359,7 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
   }
   if(opt.initial.values){
     par <- c(par,initstate = initstate)
-    bo = initstatebounds(y,errortype,trendtype,seasontype)
+    bo <- initstatebounds(y,errortype,trendtype,seasontype)
     lower <- c(lower,initstate = bo$lower)
     upper <- c(upper,initstate = bo$upper)    
   }else{
@@ -371,16 +369,16 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
     par <- c(par,k=100)
     lower <- c(lower,k=1)
     upper <- c(upper,k=200)  
-    optK = TRUE
+    optK <- TRUE
   }else if(!(class(k)=="numeric")){
     par.noopt <- c(par.noopt,k=2)
-    optK = FALSE
+    optK <- FALSE
   }else if(k<=0){
     par.noopt <- c(par.noopt,k=2)
-    optK = FALSE
+    optK <- FALSE
   }else{
     par.noopt <- c(par.noopt,k=k)
-    optK = FALSE
+    optK <- FALSE
   }
   
   np <- length(par)
@@ -389,7 +387,7 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
                 loglik=-Inf,aic=Inf,bic=Inf,aicc=Inf,mse=Inf,
                 amse=Inf,tau2=Inf,fit=NULL,states=initstate,par=par))  
 
-  env <- etsTargetFunctionInit(par=par, y=y, errortype=errortype, trendtype=trendtype,
+  env <- robetsTargetFunctionInit(par=par, y=y, errortype=errortype, trendtype=trendtype,
                              seasontype=seasontype, damped=damped, par.noopt=par.noopt, lowerb=lower, upperb=upper,
                              opt.crit=opt.crit, nmse=as.integer(nmse), bounds=bounds, m=m,pnames=names(par),pnames2=names(par.noopt),
                              opt.sigma0=opt.sigma0, opt.initial.values = opt.initial.values, optK = optK)
@@ -399,7 +397,7 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
     fit.par <- fred$par
     names(fit.par) <- names(par)
   if(opt.sigma0 && !is.na(fit.par["sigma0"])){
-    sigma0 = fit.par["sigma0"]
+    sigma0 <- fit.par["sigma0"]
   }
   if(opt.initial.values){
     initstate <- fit.par[grep('^initstate', names(fit.par))]
@@ -451,7 +449,7 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
   return(list(roblik=e$roblik,robaic=robaic,robbic=robbic,robaicc=robaicc,loglik=-0.5*e$lik,aic=aic,bic=bic,aicc=aicc,mse=mse,amse=amse,tau2=tau2,fit=fred,residuals=ts(e$e,frequency=tsp.y[3],start=tsp.y[1]),fitted=ts(fits,frequency=tsp.y[3],start=tsp.y[1]),states=states,par=fit.par))
 }
 
-etsTargetFunctionInit <- function(par,y,errortype,trendtype,seasontype,damped,par.noopt,lowerb,upperb,
+robetsTargetFunctionInit <- function(par,y,errortype,trendtype,seasontype,damped,par.noopt,lowerb,upperb,
                                   opt.crit,nmse,bounds,m,pnames,pnames2,opt.sigma0,opt.initial.values,optK)
 {  
   names(par) <- pnames
@@ -510,9 +508,9 @@ etsTargetFunctionInit <- function(par,y,errortype,trendtype,seasontype,damped,pa
     givenPhi <- TRUE
   }
   
-  givenInit = !opt.initial.values
-  givenK = !optK
-  givenSigma0 = !opt.sigma0
+  givenInit <- !opt.initial.values
+  givenK <- !optK
+  givenSigma0 <- !opt.sigma0
   
   initstate <- c(par[grep('^initstate', names(par))],par.noopt[grep('^initstate', names(par.noopt))])
   if(is.na(sum(initstate)))
@@ -536,7 +534,7 @@ etsTargetFunctionInit <- function(par,y,errortype,trendtype,seasontype,damped,pa
   
   env <- new.env()
   
-  res <- .Call("etsTargetFunctionInit", y=y, errortype=switch(errortype,"A"=1,"M"=2),
+  res <- .Call("robetsTargetFunctionInit", y=y, errortype=switch(errortype,"A"=1,"M"=2),
                trendtype=switch(trendtype,"N"=0,"A"=1,"M"=2), seasontype=switch(seasontype,"N"=0,"A"=1,"M"=2),
                damped=damped, lowerb=lowerb, upperb=upperb,
                opt.crit=opt.crit, nmse=as.integer(nmse), bounds=bounds, m=m,
@@ -635,7 +633,7 @@ robinitstate <-  function(y, errortype, trendtype, seasontype)
       l0 <- l0 * (1 + 1e-3)
       b0 <- b0 * (1 - 1e-3)
     }
-    ydt = l0 + (1:startup) * b0
+    ydt<-l0 + (1:startup) * b0
   }
 
   if (seasontype != "N")
@@ -659,17 +657,17 @@ robinitstate <-  function(y, errortype, trendtype, seasontype)
         sigma0 <- mad((y[1:startup] - ydt / init.seas) / (ydt / init.seas))
     }
 
-    init.seas = rev(init.seas) # reverse to match convention in ETS
+    init.seas <- rev(init.seas) # reverse to match convention in ETS
     names(init.seas) <- paste("s", 0:(m - 1), sep = "")
 
     if (seasontype == "A") {
-      l0 = l0 + mean(init.seas)
-      init.seas = init.seas[1:(m - 1)] - mean(init.seas)
+      l0 <- l0 + mean(init.seas)
+      init.seas <- init.seas[1:(m - 1)] - mean(init.seas)
     }
     if (seasontype == "M") {
-      me = mean(init.seas)
-      l0 = l0 * me
-      init.seas = init.seas[1:(m - 1)] / me
+      me <- mean(init.seas)
+      l0 <- l0 * me
+      init.seas <- init.seas[1:(m - 1)] / me
     }
   } else
     # non-seasonal model
@@ -738,7 +736,7 @@ initstate2 <- function(y,errortype,trendtype,seasontype)
   {
     l0 <- mean(y.sa[1:maxn])
     b0 <- NULL
-    sigma0 = sqrt(mean((y.sa[1:maxn]-l0)^2))
+    sigma0 <- sqrt(mean((y.sa[1:maxn]-l0)^2))
   }
   else  # Simple linear regression on seasonally adjusted data
   {
@@ -754,7 +752,7 @@ initstate2 <- function(y,errortype,trendtype,seasontype)
         l0 <- l0*(1+1e-3)
         b0 <- b0*(1-1e-3)
       }
-      sigma0 = sqrt(mean(fit$residuals^2))
+      sigma0 <- sqrt(mean(fit$residuals^2))
     }
     else #if(trendtype=="M")
     {
@@ -770,7 +768,7 @@ initstate2 <- function(y,errortype,trendtype,seasontype)
         l0 <- max(y.sa[1],1e-3)
         b0 <- max(y.sa[2]/y.sa[1],1e-3)
       }
-      sigma0 = sqrt(mean((fit$resid/(y-fit$resid))^2))
+      sigma0 <- sqrt(mean((fit$resid/(y-fit$resid))^2))
     }
   }
   
@@ -782,211 +780,27 @@ initstate2 <- function(y,errortype,trendtype,seasontype)
 }
 
 initstatebounds <- function(y,errortype,trendtype,seasontype){
-  m = frequency(y)
+  m <- frequency(y)
   
-  up = max(y)
-  lo = min(y)
+  up <- max(y)
+  lo <- min(y)
   
   j=1
   if(trendtype !="N"){
-    d = diff(y)
-    up[2] = max(d)
-    lo[2] = min(d)
+    d <- diff(y)
+    up[2] <- max(d)
+    lo[2] <- min(d)
     j=j+1
   }
   if(seasontype == "A"){
-    up[(j+1):(j+m-1)] = rep(max(y)-min(y),m-1)
-    lo[(j+1):(j+m-1)] = -rep(max(y)-min(y),m-1)
+    up[(j+1):(j+m-1)] <- rep(max(y)-min(y),m-1)
+    lo[(j+1):(j+m-1)] <- -rep(max(y)-min(y),m-1)
   }
   if(seasontype == "M"){
-    up[(j+1):(j+m-1)] = rep(max(y)/min(y),m-1)
-    lo[(j+1):(j+m-1)] = rep(min(y)/max(y),m-1)
+    up[(j+1):(j+m-1)] <- rep(max(y)/min(y),m-1)
+    lo[(j+1):(j+m-1)] <- rep(min(y)/max(y),m-1)
   }
   return(list(upper=up,lower=lo))
-}
-
-#' Print robets model
-#'
-#' @param x An object of class \code{robets}.
-#' @param ... Other undocumented arguments.
-#' 
-#' @examples
-#' model <- robets(nottem)
-#' print(model)
-#' @export
-print.robets <- function(x, ...)
-{
-  cat(paste(x$method, "\n\n"))
-  cat(paste("Call:\n", deparse(x$call), "\n\n"))
-  ncoef <- length(x$initstate)
-  if(!is.null(x$lambda))
-    cat("  Box-Cox transformation: lambda=",round(x$lambda,4), "\n\n")
-  
-  cat("  Smoothing parameters:\n")
-  cat(paste("    alpha =", round(x$par["alpha"], 4), "\n"))
-  if(x$components[2]!="N")
-    cat(paste("    beta  =", round(x$par["beta"], 4), "\n"))
-  if(x$components[3]!="N")
-    cat(paste("    gamma =", round(x$par["gamma"], 4), "\n"))
-  if(x$components[4]!="FALSE")
-    cat(paste("    phi   =", round(x$par["phi"], 4), "\n"))
-  
-  cat("\n  Initial states:\n")
-  cat(paste("    sigma =", round(x$initstate[1], 4), "\n"))
-  cat(paste("    l =", round(x$initstate[2], 4), "\n"))
-  if (x$components[2]!="N")
-    cat(paste("    b =", round(x$initstate[3], 4), "\n"))
-  else
-  {
-    x$initstate <- c(x$initstate[1:2], NA, x$initstate[3:ncoef])
-    ncoef <- ncoef+1
-  }
-  if (x$components[3]!="N")
-  {
-    cat("    s=")
-    if (ncoef <= 9)
-      cat(round(x$initstate[4:ncoef], 4))
-    else
-    {
-      cat(round(x$initstate[4:9], 4))
-      cat("\n           ")
-      cat(round(x$initstate[10:ncoef], 4))
-    }
-    cat("\n")
-  }
-  
-  cat("\n  sigma:  ")
-  cat(round(sqrt(x$sigma2),4))
-  if(!is.null(x$aic))
-  {
-    stats <- c(x$robaic,x$robaicc,x$robbic)
-    names(stats) <- c("robAIC","robAICc","robBIC")
-    cat("\n\n")
-    print(stats)
-  }
-  #    cat("\n  AIC:    ")
-  #    cat(round(x$aic,4))
-  #    cat("\n  AICc:   ")
-  #    cat(round(x$aicc,4))
-  #    cat("\n  BIC:    ")
-  #    cat(round(x$bic,4))
-}
-
-#' Compute the tau2 estimator of scale
-#'
-#' @param x A vector of residuals.
-#' @return The tau2 estimate of scale.
-#' @description The tau2-estimator is a robust measure of the scale. The exact formula of the estimator is in Crevits and Croux (2016), equation 3.10.
-#' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
-#' 
-#' @examples
-#' set.seed(100)
-#' e <- 10*rnorm(100)
-#' mse <- mean(e^2) 
-#' tse <- tau2(e) 
-#' @export
-tau2 = function(x){
-  .Call('robets_tau2', PACKAGE = 'robets', x)
-}
-
-
-### PLOT COMPONENTS
-
-#' Plot robets model
-#' 
-#' @param x An object of class \code{robets}.
-#' @param ... Other plotting parameters.
-#' @method plot robets
-#'
-#' @examples
-#' model <- robets(nottem)
-#' plot(model)
-#' @seealso \code{\link{plotOutliers}, \link{plot.ets}}
-#' @export
-plot.robets <- function(x,...)
-{
-  if(!is.null(x$lambda))
-    y <- BoxCox(x$x,x$lambda)
-  else
-    y <- x$x
-  if(x$components[3]=="N" & x$components[2]=="N")
-  {
-    plot(cbind(observed=y, level=x$states[,2]),
-         main=paste("Decomposition by",x$method,"method"),...)
-  }
-  else if(x$components[3]=="N")
-  {
-    plot(cbind(observed=y, level=x$states[,2], slope=x$states[,"b"]),
-         main=paste("Decomposition by",x$method,"method"),...)
-  }
-  else if(x$components[2]=="N")
-  {
-    plot(cbind(observed=y, level=x$states[,2], season=x$states[,"s1"]),
-         main=paste("Decomposition by",x$method,"method"),...)
-  }
-  else
-  {
-    plot(cbind(observed=y, level=x$states[,2], slope=x$states[,"b"],
-               season=x$states[,"s1"]),
-         main=paste("Decomposition by",x$method,"method"),...)
-  }
-}
-
-#' Summary robets model
-#' 
-#' @param object An object of class \code{robets}.
-#' @param ... Other undocumented arguments.
-#' 
-#' @return A number of training set error measures: ME (mean error), RMSE (root mean squared error), MAE (mean absolute error), MPE (mean percentage error), MAPE (mean absolute percentage error), MedianE (median error), RTSE (root tau squared error), RTSPE (root tau squared percentage error).
-#'
-#' @examples
-#' model = robets(nottem)
-#' summary(model)
-#' @export
-summary.robets <- function(object, ...)
-{
-  res <- object$x - object$fitted # one step ahead prediction errors, in sample
-  pe <- res/object$fitted * 100
-  me <- mean(res,na.rm=TRUE)
-  mse <- mean(res^2,na.rm=TRUE)
-  mae <- mean(abs(res),na.rm=TRUE)
-  mape <- mean(abs(pe),na.rm=TRUE)
-  mpe <-  mean(pe,na.rm=TRUE)
-  errors <- c(me, sqrt(mse), mae, mpe, mape)
-  names(errors) <- c("ME", "RMSE", "MAE", "MPE", "MAPE")
-  
-  print(object)
-  cat("Training set: non robust error measures: \n")
-  print(errors)
-  
-  cat("Training set: robust error measures: \n")
-  me <- median(res,na.rm=TRUE)
-  t2 <- tau2(res)
-  t2p <- tau2(pe)
-  errorsr <- c(me, t2, t2p)
-  names(errorsr) <- c("MedianE", "RTSE", "RTSPE")
-  print(errorsr)
-  
-  return(c(errors,errorsr))
-}
-
-#' Coef robets model
-#' 
-#' @param object An object of class \code{robets}.
-#' @param ... Other undocumented arguments.
-#'
-#' @examples 
-#' model <- robets(nottem)
-#' coef(model)
-#' @export
-coef.robets <- function(object, ...)
-{
-  object$par
-}
-
-logLik.robets <- function(object)
-{
-  structure(object$loglik,df=length(object$par),class="logLik")
 }
 
 admissible <- function(alpha,beta,gamma,phi,m)
@@ -1088,41 +902,6 @@ check.param <- function(alpha,beta,gamma,phi,lower,upper,bounds,m)
       return(0)
   }
   return(1)
-}
-
-#' Plot outliers detected by robets model
-#' 
-#' @param object An object of class \code{robets}.
-#' @param xlab Label of the x-axis.
-#' @param ylab Label of the y-asix.
-#' @param type Character indicating the type of plot, just as in \code{plot}.
-#' @param ... Other plotting parameters.
-#'
-#' @examples
-#' model <- robets(nottem)
-#' plotOutliers(model)
-#' @seealso \code{\link{plot.robets}}
-#' @export
-plotOutliers <- function(object, xlab="", ylab="", type="l", ...) {
-  y <- object$x
-  ny <- length(y)
-  y2 <- na.contiguous(y)
-  if(ny != length(y2))
-    warning("Missing values encountered. Using longest contiguous portion of time series, just as in robets.")
-  y <- as.ts(y2)
-  n <- length(y)
-  plot(y, xlab = xlab, ylab = ylab, type = type, main=paste("Outlier detection with", object$method,"method"), ...)
-  
-  m <- frequency(y)
-  srt <- start(y)
-  
-  for( t in 1:n){
-    if(object$outlier[t]){
-      points(srt[1]+(t-1+srt[2]-1)/m, y[t],col="red",pch = 19)
-    }
-  }
-  
-  if(sum(object$outlier) == 0) message("No outliers detected.")
 }
 
 # Repeated Median

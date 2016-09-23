@@ -16,7 +16,7 @@ robets(y, model = "ZZZ", damped = NULL, alpha = NULL, beta = NULL,
 \arguments{
 \item{y}{a numeric vector or time series}
 
-\item{model}{A three-letter string indicating the method using the framework terminology of Hyndman et al. (2008). The first letter denotes the error type ("A", "M" or "Z"); the second letter denotes the trend type ("N","A","M" or "Z"); and the third letter denotes the season type ("N","A","M" or "Z"). In all cases, "N"=none, "A"=additive, "M"=multiplicative and "Z"=automatically selected. So, for example, "ANN" is simple exponential  smoothing with additive errors, "MAM" is multiplicative Holt-Winters' method with multiplicative errors, and so on. It is also possible for the model to be of class "\code{robets}", and equal to the output from a previous call to \code{robets}. In this case, the same model is fitted to \code{y} without re-estimating any smoothing parameters. See also the \code{use.initial.values} argument.}
+\item{model}{A three-letter string indicating the method using the framework terminology of Hyndman et al. (2008). The first letter denotes the error type ("A", "M" or "Z"); the second letter denotes the trend type ("N","A" or "Z"); and the third letter denotes the season type ("N","A","M" or "Z"). In all cases, "N"=none, "A"=additive, "M"=multiplicative and "Z"=automatically selected. So, for example, "ANN" is simple exponential  smoothing with additive errors, "MAM" is multiplicative Holt-Winters' method with multiplicative errors, and so on. It is also possible for the model to be of class "\code{robets}", and equal to the output from a previous call to \code{robets}. In this case, the same model is fitted to \code{y} without re-estimating any smoothing parameters. See also the \code{use.initial.values} argument.}
 
 \item{damped}{If TRUE, use a damped trend. If NULL, both damped and non-damped trends will be tried and the best model (according to the information criterion \code{ic}) will be returned.}
 
@@ -44,13 +44,13 @@ robets(y, model = "ZZZ", damped = NULL, alpha = NULL, beta = NULL,
 
 \item{use.initial.values}{If \code{TRUE} and \code{model} is of class \code{"robets"}, then the initial values in the model are also not re-estimated.}
 
-\item{opt.initial.values}{If \code{TRUE} (default) the initial values are part of the problem to optimize \code{opt.crit}. If \code{FALSE} a robust heuristic is used for chosing the initial values. Neglected if \code{use.initial.values} is \code{TRUE} and \code{model} is of class \code{"robets"}.}
+\item{opt.initial.values}{If \code{FALSE} (default) a robust heuristic is used for chosing the initial values. If \code{TRUE}  the initial values are part of the problem to optimize \code{opt.crit}.  Neglected if \code{use.initial.values} is \code{TRUE} and \code{model} is of class \code{"robets"}.}
 
 \item{rob.start.initial.values}{If \code{TRUE} (default) the initial values are computed via the robust heuristic described in Crevits and Croux (2016). If \code{FALSE} the initial values are computed via the same heuristic as in Hyndman et al. (2008). The initial values computed with these methods are further optimized if \code{opt.initial.values} is \code{TRUE}.}
 
-\item{opt.sigma0}{If \code{FALSE} (default) sigma0 is equal to the value computed together with the other initial values via a heuristic. If \code{TRUE} sigma0 is included as a variable in the optimization problem.}
+\item{opt.sigma0}{If \code{FALSE} (default) sigma0 is equal to the value computed together with the other initial values via a heuristic. If \code{TRUE} sigma0 is included as a variable in the optimization problem. It is not recommended to set \code{opt.sigma0 = TRUE}.}
 
-\item{k}{Value of k in forecasting equations. If NULL, it is estimated, \code{k=2} is default.}
+\item{k}{Value of k in forecasting equations. \code{k=3} is default. If NULL, \code{k} is included as a variable in the optimization problem. It is not recommended to set \code{k = NULL}.}
 
 \item{nmse}{Number of steps for AMSE (1<=\code{nmse}<=30), \code{nmse=1} is default.}
 
@@ -63,7 +63,7 @@ An object of class "\code{robets}".
 Returns robets model applied to \code{y}.
 }
 \details{
-The methodology is fully automatic. The only required argument for robets is the time series. The model is chosen automatically if not specified.
+The code is an extended version of the code of the function \code{ets} of the package \code{forecast} of Hyndman and Khandakar (2008). The methodology is an extended version of Gelper et al. (2008). In Crevits and Croux (2016) the methodology of \code{robets} is described in full (\url{https://rcrevits.wordpress.com/research}).
 }
 \examples{
 library(forecast)
@@ -81,6 +81,6 @@ Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and
 Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
 }
 \seealso{
-\code{\link{forecast.robets}, \link{plot.robets}, \link{tau2}, \link{ets}}
+\code{\link{forecast.robets}, \link{plot.robets}, \link{plotOutliers}, \link{tau2}, \link{ets}}
 }
 
