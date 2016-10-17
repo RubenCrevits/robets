@@ -37,7 +37,7 @@ public:
 
 private:
 
-  void etscalc();
+  void robetscalc();
   void forecast(double& l,  double& b, double *s, double *f, int& h);
   void update(double* oldl, double* l, double* oldb, double* b, double *olds, double *s, double& y);
 	bool check_params();

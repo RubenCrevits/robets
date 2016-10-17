@@ -162,7 +162,7 @@ void RobetsTargetFunction::eval(const double* p_par, int p_par_length) {
 
 	for(int i=0; i < nstate*n; i++) state.push_back(0);
 
-	etscalc();
+	robetscalc();
 
 
 	// Avoid perfect fits
@@ -327,7 +327,7 @@ bool RobetsTargetFunction::admissible() {
 	return(true);
 }
 
-void RobetsTargetFunction::etscalc(){
+void RobetsTargetFunction::robetscalc(){
   int i, j;
   double oldsigma, sigma, oldl, l, oldb, b, olds[24], s[24], f[30], lik2, tmp, ydown;
     
@@ -606,7 +606,7 @@ void RobetsTargetFunction::oneEval(std::vector<double> & p_y, int p_errortype,
   }
 
   for(unsigned i=0; i < nstate*this->y.size(); i++) state.push_back(0);    
-  etscalc();
+  robetscalc();
 }
 
 double RobetsTargetFunction::rhobiweight(double x){

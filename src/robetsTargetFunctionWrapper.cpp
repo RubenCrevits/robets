@@ -13,7 +13,7 @@
 
 // This function initializes all the parameters, constructs an
 // object of type RobetsTargetFunction and adds an external pointer
-// to this object with name "ets.xptr"
+// to this object with name "robets.xptr"
 // to the environment submitted as p_rho
 //
 RcppExport SEXP robetsTargetFunctionInit(SEXP p_y, SEXP p_errortype, SEXP p_trendtype,
@@ -78,14 +78,14 @@ RcppExport SEXP robetsTargetFunctionInit(SEXP p_y, SEXP p_errortype, SEXP p_tren
 			alpha, beta, gamma, phi, sigma0, initstate, k);
 
 	Rcpp::Environment e(p_rho);
-	e["ets.xptr"] = Rcpp::XPtr<RobetsTargetFunction>( sp, true );
+	e["robets.xptr"] = Rcpp::XPtr<RobetsTargetFunction>( sp, true );
 
 	return Rcpp::wrap(e);
 
 	END_RCPP;
 }
 
-double targetFunctionEtsNelderMead(int n, double *par, void *ex)
+double targetFunctionRobetsNelderMead(int n, double *par, void *ex)
 {
 	RobetsTargetFunction* sp = (RobetsTargetFunction*) ex;
 
@@ -95,7 +95,7 @@ double targetFunctionEtsNelderMead(int n, double *par, void *ex)
 }
 
 
-RcppExport SEXP etsNelderMead(SEXP p_var, SEXP p_env, SEXP p_abstol,
+RcppExport SEXP robetsNelderMead(SEXP p_var, SEXP p_env, SEXP p_abstol,
 		SEXP p_intol, SEXP p_alpha, SEXP p_beta, SEXP p_gamma,
 		SEXP p_trace, SEXP p_maxit)
 {
@@ -117,9 +117,9 @@ RcppExport SEXP etsNelderMead(SEXP p_var, SEXP p_env, SEXP p_abstol,
 	Rcpp::NumericVector opar(dpar.size());
 
 	Rcpp::Environment e(p_env);
-	Rcpp::XPtr<RobetsTargetFunction> sp(e.get("ets.xptr"));
+	Rcpp::XPtr<RobetsTargetFunction> sp(e.get("robets.xptr"));
 
-	double (*funcPtr)(int n, double *par, void *ex) = targetFunctionEtsNelderMead;
+	double (*funcPtr)(int n, double *par, void *ex) = targetFunctionRobetsNelderMead;
 
 	nmmin(dpar.size(), dpar.begin(), opar.begin(), &Fmin, funcPtr,
 			&fail, abstol, intol, sp, alpha, beta, gamma, trace, &fncount, maxit);

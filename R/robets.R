@@ -73,7 +73,7 @@ robets <- function(y, model="ZZZ", damped=NULL,
   if(sum((upper-lower)>0)<4)
     stop("Lower limits must be less than upper limits")
   
-  # If model is an ets object, re-fit model to new data
+  # If model is an robets object, re-fit model to new data
   if(class(model)=="robets")
   {
     alpha <- model$par["alpha"]
@@ -392,7 +392,7 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
                              opt.crit=opt.crit, nmse=as.integer(nmse), bounds=bounds, m=m,pnames=names(par),pnames2=names(par.noopt),
                              opt.sigma0=opt.sigma0, opt.initial.values = opt.initial.values, optK = optK)
 
-  fred <- .Call("etsNelderMead", par, env, -Inf, sqrt(.Machine$double.eps), 1.0, 0.5, 2.0, trace, maxit, package="robets")
+  fred <- .Call("robetsNelderMead", par, env, -Inf, sqrt(.Machine$double.eps), 1.0, 0.5, 2.0, trace, maxit, package="robets")
   
     fit.par <- fred$par
     names(fit.par) <- names(par)
