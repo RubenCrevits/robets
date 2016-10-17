@@ -82,14 +82,6 @@ private:
 	bool optAlpha, optBeta, optGamma, optPhi, givenAlpha, givenBeta, givenGamma, givenPhi;
   bool optSigma0, optInit, optK, givenSigma0, givenInit, givenK;
   
-  static const int NONE = 0;
-  static const int ADD = 1;
-  static const int MULT = 2;
-  static const int DAMPED = 1;
-  static const double TOL = 1.0e-10;
-  static const double HUGEN = 1.0e10;
-  static const double NA  = -99999.0;
-  
-  static const double LAMBDA_SIGMA = 0.1;
+
 
 };

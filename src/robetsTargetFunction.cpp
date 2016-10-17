@@ -1,10 +1,19 @@
-//#include <cmath>
+#include <cmath>
 #include <R.h>
-#include <Math.h>
 
-#include "RobetsTargetFunction.h"
+#include "robetsTargetFunction.h"
 
 #include <R_ext/Print.h>
+
+const int NONE = 0;
+const int ADD = 1;
+const int MULT = 2;
+const int DAMPED = 1;
+const double TOL = 1.0e-10;
+const double HUGEN = 1.0e10;
+const double NA  = -99999.0;
+
+const double LAMBDA_SIGMA = 0.1;
 
 void RobetsTargetFunction::init(std::vector<double> & p_y, int p_errortype,
 		int p_trendtype, int p_seasontype, bool p_damped,
