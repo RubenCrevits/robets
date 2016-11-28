@@ -45,7 +45,6 @@ private:
   double rhobiweight(double x);
   double Erho();
   double psihuber(double x);
-  double roblikM(std::vector<double>& x);
   
   double median(std::vector<double> x);
 

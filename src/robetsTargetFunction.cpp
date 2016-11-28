@@ -1,6 +1,5 @@
 #include <cmath>
 #include <R.h>
-
 #include "robetsTargetFunction.h"
 
 #include <R_ext/Print.h>
@@ -310,7 +309,7 @@ bool RobetsTargetFunction::admissible() {
 
 		double max = 0;
 		for(unsigned i=0;i<zeror.size();i++) {
-		  double abs_val = sqrt(zeror[i]*zeror[i] + zeroi[i]*zeroi[i]);
+		  double abs_val = std::sqrt(zeror[i]*zeror[i] + zeroi[i]*zeroi[i]);
 		  if(abs_val>max) max = abs_val;
 		}
 
@@ -393,7 +392,7 @@ void RobetsTargetFunction::robetscalc(){
         }    
         
           // ROBUSTNESS STEP
-        sigma = sqrt( LAMBDA_SIGMA*rhobiweight(e[i]/oldsigma)*oldsigma*oldsigma + (1.0-LAMBDA_SIGMA)*oldsigma*oldsigma); 
+        sigma = std::sqrt( LAMBDA_SIGMA*rhobiweight(e[i]/oldsigma)*oldsigma*oldsigma + (1.0-LAMBDA_SIGMA)*oldsigma*oldsigma); 
         if(errortype==ADD){
           ydown = sigma*psihuber(e[i]/sigma) + f[0];
         }else{
@@ -443,7 +442,7 @@ void RobetsTargetFunction::robetscalc(){
       roblik = n*log(n*tau2); 
     }else{ // errortype = MULT
       tau2 = computeTau2(e); 
-      roblik = n*log(n*tau2)+2*lik2; //roblikM(e);  
+      roblik = n*log(n*tau2)+2*lik2; 
     }
 
 }
@@ -618,8 +617,8 @@ double RobetsTargetFunction::rhobiweight(double x){
 }
 
 double RobetsTargetFunction::Erho(){
-  double dnormk = exp(-k*k/2.0)/sqrt(2.0*M_PI);
-  double pnormk = 0.5*erfc(-k/sqrt(2));
+  double dnormk = R::dnorm(k, 0.0, 1.0, 0); //exp(-k*k/2.0)/sqrt(2.0*M_PI);
+  double pnormk = R::pnorm(k, 0.0, 1.0, 1, 0); //0.5*erfc(-k/sqrt(2));
   double d1 = pnormk-0.5-k*dnormk;
   double d2 = 3.0*d1-pow(k,3)*dnormk;
   double d3 = 5.0*d2-pow(k,5)*dnormk;
@@ -646,8 +645,8 @@ double RobetsTargetFunction::median(std::vector<double> x) {
 double RobetsTargetFunction::computeTau2(std::vector<double>& x){
   // compute Erho
   const double kt = 3.0;//2.0;
-  const double dnormk = exp(-kt*kt/2.0)/sqrt(2.0*M_PI);
-  const double pnormk = 0.5*erfc(-kt/sqrt(2.0));
+  const double dnormk = R::dnorm(kt, 0.0, 1.0, 0); //exp(-kt*kt/2.0)/sqrt(2.0*M_PI);
+  const double pnormk = R::pnorm(kt, 0.0, 1.0, 1, 0); //0.5*erfc(-kt/sqrt(2.0));
   const double d1 = pnormk-0.5-kt*dnormk;
   const double d2 = 3.0*d1-pow(kt,3)*dnormk;
   const double d3 = 5.0*d2-pow(kt,5)*dnormk;
@@ -668,38 +667,4 @@ double RobetsTargetFunction::computeTau2(std::vector<double>& x){
     tauscale = tauscale + rho/Erho;
   }
   return (1.0/x.size())*pow(sc,2)*tauscale;
-}
-
-double RobetsTargetFunction::roblikM(std::vector<double>& x){
-  // compute Erho
-  const double kt = 2.0;//2.0;
-  const double dnormk = exp(-kt*kt/2.0)/sqrt(2.0*M_PI);
-  const double pnormk = 0.5*erfc(-kt/sqrt(2.0));
-  const double d1 = pnormk-0.5-kt*dnormk;
-  const double d2 = 3.0*d1-pow(kt,3)*dnormk;
-  const double d3 = 5.0*d2-pow(kt,5)*dnormk;
-  const double Erho = (6.0/pow(kt,2))*d1 - (6.0/pow(kt,4))*d2 + (2.0/pow(kt,6))*d3 + 2.0*(1.0-pnormk);
-  
-  std::vector<double> x2;  
-  for(int i = 0 ; i<n ; ++i){
-    x2.push_back(x[i]*x[i]);
-  }
-  double sc = 1.482602*sqrt(median(x2));
-  double tauscale = 0.0;
-  double rho;
-  for(int i = 0 ; i < n ; ++i){
-    rho = 1.0;
-    if(std::abs(x[i]/sc)<kt){
-      rho = 1.0-pow((1.0-pow((x[i]/sc)/kt,2)),3);
-    }
-    x2[i] = rho/Erho;
-    tauscale = tauscale + rho/Erho;
-  }
-  
-  double logypred = 0.0;
-  for(int i = 0 ; i<n ; ++i){
-    logypred = logypred + log(std::abs(y[i])) - log(std::abs(1+copysign(1.0,x[i])*sc*sqrt(x2[i])));
-  }
-  
-  return n*log(pow(sc,2)*tauscale) + 2*logypred;
 }

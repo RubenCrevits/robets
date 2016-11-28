@@ -63,7 +63,7 @@ An object of class "\code{robets}".
 Returns robets model applied to \code{y}.
 }
 \details{
-The code is an extended version of the code of the function \code{ets} of the package \code{forecast} of Hyndman and Khandakar (2008). The methodology is an extended version of Gelper et al. (2008). In Crevits and Croux (2016) the methodology of \code{robets} is described in full (\url{https://rcrevits.wordpress.com/research}).
+The code is an extended version of the code of the function \code{ets} of the package \code{forecast} of Hyndman and Khandakar (2008). The methodology is an extended version of Gelper et al. (2008). In Crevits and Croux (2016) the methodology of \code{robets} is described in full.
 }
 \examples{
 library(forecast)
@@ -71,14 +71,14 @@ model <- robets(nottem)
 plot(forecast(model))
 }
 \author{
-Ruben Crevits, \email{ruben.crevits@kuleuven.be}
+Ruben Crevits, \email{ruben.crevits@kuleuven.be}, \url{https://rcrevits.wordpress.com/research}
 }
 \references{
-Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
+Crevits, R., and Croux, C (2016) "Forecasting with Robust Exponential Smoothing with Damped Trend and Seasonal Components".\emph{Working paper}. \url{https://doi.org/10.13140/RG.2.2.11791.18080}
 
-Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300.
+Gelper S., Fried R. and Croux C. (2010) "Robust Forecasting with Exponential and Holt-Winters Smoothing".\emph{Journal of Forecasting}, \strong{29}, 285-300. \url{https://doi.org/10.1002/for.1125}
 
-Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
+Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3). \url{https://doi.org/10.18637/jss.v027.i03}
 }
 \seealso{
 \code{\link{forecast.robets}, \link{plot.robets}, \link{plotOutliers}, \link{tau2}, \link{ets}}

@@ -22,6 +22,6 @@ mse <- mean(e^2)
 tse <- tau2(e) 
 }
 \references{
-Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
+Crevits, R., and Croux, C (2016) "Forecasting with Robust Exponential Smoothing with Damped Trend and Seasonal Components".\emph{Working paper}. \url{https://doi.org/10.13140/RG.2.2.11791.18080}
 }
 

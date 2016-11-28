@@ -22,9 +22,9 @@
 #' library(forecast)
 #' model <- robets(nottem)
 #' plot(forecast(model))
-#' @references Crevits, R., and Croux, C (2016) "Robust Exponential Smoothing".\emph{Working paper}.
-#' @references Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3).
-#' @author Ruben Crevits, \email{ruben.crevits@@kuleuven.be}
+#' @references Crevits, R., and Croux, C (2016) "Forecasting with Robust Exponential Smoothing with Damped Trend and Seasonal Components".\emph{Working paper}. \url{https://doi.org/10.13140/RG.2.2.11791.18080}
+#' @references Hyndman, R. J., and Khandakar, Y (2008) "Automatic time series forecasting: The forecasting package for R".\emph{Journal of Statistical Software} \strong{27}(3). \url{https://doi.org/10.18637/jss.v027.i03}
+#' @author Ruben Crevits, \email{ruben.crevits@@kuleuven.be}, \url{https://rcrevits.wordpress.com/research}
 #' @seealso \code{\link{robets}}
 #'
 #' @export
