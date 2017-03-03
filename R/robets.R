@@ -289,7 +289,7 @@ robpegelsresid.C <- function(y,m,initstate,errortype,trendtype,seasontype,damped
     gamma <- 0;
   }
   
-  res <- .Call("robets_calc_out",y,m,initstate,switch(errortype,"A"=1,"M"=2), switch(trendtype,"N"=0,"A"=1,"M"=2), switch(seasontype,"N"=0,"A"=1,"M"=2),damped,alpha,beta,gamma,phi,nmse,k,package="robets")
+  res <- .Call("robets_calc_out",y,m,initstate,switch(errortype,"A"=1,"M"=2), switch(trendtype,"N"=0,"A"=1,"M"=2), switch(seasontype,"N"=0,"A"=1,"M"=2),damped,alpha,beta,gamma,phi,nmse,k,PACKAGE ="robets")
   if(!is.na(res$lik)){
     if(abs(res$lik+99999) < 1e-7)
       res$lik <- NA
@@ -392,7 +392,7 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
                              opt.crit=opt.crit, nmse=as.integer(nmse), bounds=bounds, m=m,pnames=names(par),pnames2=names(par.noopt),
                              opt.sigma0=opt.sigma0, opt.initial.values = opt.initial.values, optK = optK)
 
-  fred <- .Call("robetsNelderMead", par, env, -Inf, sqrt(.Machine$double.eps), 1.0, 0.5, 2.0, trace, maxit, package="robets")
+  fred <- .Call("robetsNelderMead", par, env, -Inf, sqrt(.Machine$double.eps), 1.0, 0.5, 2.0, trace, maxit, PACKAGE = "robets")
   
     fit.par <- fred$par
     names(fit.par) <- names(par)
@@ -540,7 +540,7 @@ robetsTargetFunctionInit <- function(par,y,errortype,trendtype,seasontype,damped
                opt.crit=opt.crit, nmse=as.integer(nmse), bounds=bounds, m=m,
                optAlpha, optBeta, optGamma, optPhi, opt.sigma0, opt.initial.values, optK,
                givenAlpha, givenBeta, givenGamma, givenPhi, givenSigma0, givenInit, givenK,
-               alpha, beta, gamma, phi,sigma0,initstate,k, env, package="robets")
+               alpha, beta, gamma, phi,sigma0,initstate,k, env, PACKAGE = "robets")
   res
 }
 
