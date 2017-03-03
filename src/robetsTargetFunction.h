@@ -73,6 +73,7 @@ private:
   double k;
 
 	std::vector<double> e;
+	std::vector<double> e2;
 	std::vector<double> amse;
 
 	double lik, objval;
@@ -80,7 +81,5 @@ private:
 
 	bool optAlpha, optBeta, optGamma, optPhi, givenAlpha, givenBeta, givenGamma, givenPhi;
   bool optSigma0, optInit, optK, givenSigma0, givenInit, givenK;
-  
-
 
 };

@@ -87,6 +87,7 @@ void RobetsTargetFunction::init(std::vector<double> & p_y, int p_errortype,
 	//	for(int i=0; i < n; i++) this->e.push_back(0);
 	this->amse.resize(30, 0);
 	this->e.resize(n, 0);
+	this->e2.resize(n-m+1, 0);
 
 }
 
@@ -327,7 +328,7 @@ bool RobetsTargetFunction::admissible() {
 }
 
 void RobetsTargetFunction::robetscalc(){
-  int i, j;
+  int i, j, maxvalue;
   double oldsigma, sigma, oldl, l, oldb, b, olds[24], s[24], f[30], lik2, tmp, ydown;
     
   if((m > 24) & (seasontype > NONE)){
@@ -370,8 +371,9 @@ void RobetsTargetFunction::robetscalc(){
                 olds[j] = s[j];
         }
 
+        maxvalue = m; //std::max(nmse,m);
         // ONE STEP FORECAST
-        forecast(oldl, oldb, olds, f,nmse);
+        forecast(oldl, oldb, olds, f, maxvalue);
         
         if(fabs(f[0]-NA) < TOL){
             lik = NA;
@@ -389,7 +391,15 @@ void RobetsTargetFunction::robetscalc(){
                 tmp = y[i+j]-f[j];
                 amse[j] += (tmp*tmp)/n;
             }
-        }    
+        } 
+        
+        if(i<n-m+1){
+          if(errortype == ADD)
+            e2[i] = y[i+m-1] - f[m-1];
+          else
+            e2[i] = (y[i+m-1]- f[m-1])/f[m-1];
+        }
+        
         
           // ROBUSTNESS STEP
         sigma = std::sqrt( LAMBDA_SIGMA*rhobiweight(e[i]/oldsigma)*oldsigma*oldsigma + (1.0-LAMBDA_SIGMA)*oldsigma*oldsigma); 
@@ -440,9 +450,11 @@ void RobetsTargetFunction::robetscalc(){
     if(errortype == ADD){
       tau2 = computeTau2(e);
       roblik = n*log(n*tau2); 
+      tau2 = 0.5*tau2 + 0.5*computeTau2(e2);
     }else{ // errortype = MULT
       tau2 = computeTau2(e); 
       roblik = n*log(n*tau2)+2*lik2; 
+      tau2 = 0.5*tau2 + 0.5*computeTau2(e2);
     }
 
 }
@@ -583,6 +595,7 @@ void RobetsTargetFunction::oneEval(std::vector<double> & p_y, int p_errortype,
         
     this->amse.resize(30, 0);
     this->e.resize(n, 0);
+    this->e2.resize(n-m+1, 0);
 
 	this->state.clear();
 
