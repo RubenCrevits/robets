@@ -1,4 +1,4 @@
-useDynLib(robets)
+useDynLib(robets, .registration = TRUE)
 import(forecast)
 import(Rcpp)
 importFrom("graphics", "plot", "points")
