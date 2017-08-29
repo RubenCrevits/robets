@@ -21,4 +21,3 @@ Summary robets model
 model <- robets(nottem)
 summary(model)
 }
-

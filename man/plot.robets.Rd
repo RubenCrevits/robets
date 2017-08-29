@@ -21,4 +21,3 @@ plot(model)
 \seealso{
 \code{\link{plotOutliers}, \link{plot.ets}}
 }
-

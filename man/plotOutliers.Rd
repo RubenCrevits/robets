@@ -27,4 +27,3 @@ plotOutliers(model)
 \seealso{
 \code{\link{plot.robets}}
 }
-

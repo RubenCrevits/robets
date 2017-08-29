@@ -18,4 +18,3 @@ Print robets model
 model <- robets(nottem)
 print(model)
 }
-

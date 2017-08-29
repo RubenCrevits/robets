@@ -18,4 +18,3 @@ Coef robets model
 model <- robets(nottem)
 coef(model)
 }
-
