@@ -17,7 +17,7 @@
 #' @param opt.crit Optimization criterion. One of "\link{tau2}" (Tau squared error of the residuals, default), "roblik" (Robust Log-likelihood), "mse" (Mean Square Error), "amse" (Average MSE over first \code{nmse} forecast horizons), "sigma" (Standard deviation of residuals), "mae" (Mean of absolute residuals), or "lik" (Log-likelihood).
 #' @param bounds Type of parameter space to impose: \code{"usual"} indicates all parameters must lie between specified lower and upper bounds; \code{"admissible"} indicates parameters must lie in the admissible space; \code{"both"} (default) takes the intersection of these regions.
 #' @param ic Information criterion to be used in model selection.
-#' @param use.initial.values If \code{TRUE} and \code{model} is of class \code{"robets"}, then the initial values in the model are also not re-estimated.
+#' @param use.initial.values If \code{TRUE} (default) and \code{model} is of class \code{"robets"}, then the initial values in the model are also not re-estimated.
 #' @param opt.initial.values If \code{FALSE} (default) a robust heuristic is used for chosing the initial values. If \code{TRUE}  the initial values are part of the problem to optimize \code{opt.crit}.  Neglected if \code{use.initial.values} is \code{TRUE} and \code{model} is of class \code{"robets"}.
 #' @param rob.start.initial.values If \code{TRUE} (default) the initial values are computed via the robust heuristic described in Crevits and Croux (2016). If \code{FALSE} the initial values are computed via the same heuristic as in Hyndman et al. (2008). The initial values computed with these methods are further optimized if \code{opt.initial.values} is \code{TRUE}.
 #' @param opt.sigma0 If \code{FALSE} (default) sigma0 is equal to the value computed together with the other initial values via a heuristic. If \code{TRUE} sigma0 is included as a variable in the optimization problem. It is not recommended to set \code{opt.sigma0 = TRUE}.
@@ -41,9 +41,8 @@ robets <- function(y, model="ZZZ", damped=NULL,
                 lower=c(rep(0.0001,3), 0.8), upper=c(rep(0.9999,3),0.98),
                 opt.crit=c("tau2","roblik","lik","mse","amse","sigma","mae"), bounds=c("both","usual","admissible"),
                 ic=c("robaicc","robaic","robbic","aicc","bic","aic"), 
-                use.initial.values=FALSE,opt.initial.values=FALSE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=3,nmse=1,...)
+                use.initial.values=TRUE,opt.initial.values=FALSE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=3,nmse=1,...)
 {
-  
   #dataname <- substitute(y)
   opt.crit <- match.arg(opt.crit)
   bounds <- match.arg(bounds)
@@ -76,6 +75,8 @@ robets <- function(y, model="ZZZ", damped=NULL,
   # If model is an robets object, re-fit model to new data
   if(class(model)=="robets")
   {
+    if(use.initial.values == FALSE && opt.initial.values == FALSE)
+      stop("Set either use.initial.values=TRUE or opt.initial.values=TRUE.")
     alpha <- model$par["alpha"]
     beta <- model$par["beta"]
     if(is.na(beta))
@@ -88,7 +89,7 @@ robets <- function(y, model="ZZZ", damped=NULL,
       phi <- NULL
     k <- model$par["k"]
     if(is.na(k))
-      k <- 2
+      k <- 3
     modelcomponents <- paste(model$components[1],model$components[2],model$components[3],sep="")
     damped <- (model$components[4]=="TRUE")
     if(use.initial.values)
@@ -371,13 +372,13 @@ robetsmodel <- function(y, errortype, trendtype, seasontype, damped,
     upper <- c(upper,k=200)  
     optK <- TRUE
   }else if(!(class(k)=="numeric")){
-    par.noopt <- c(par.noopt,k=2)
+    par.noopt <- c(par.noopt,k=3)
     optK <- FALSE
   }else if(k<=0){
-    par.noopt <- c(par.noopt,k=2)
+    par.noopt <- c(par.noopt,k=3)
     optK <- FALSE
   }else{
-    par.noopt <- c(par.noopt,k=k)
+    par.noopt <- c(par.noopt,k=unname(k))
     optK <- FALSE
   }
   
