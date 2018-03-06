@@ -14,7 +14,7 @@
 #' @param lambda Box-Cox transformation parameter. Ignored if NULL. Otherwise, data transformed before model is estimated. When \code{lambda=TRUE}, \code{additive.only} is set to FALSE.
 #' @param lower Lower bounds for the parameters (alpha, beta, gamma, phi)
 #' @param upper Upper bounds for the parameters (alpha, beta, gamma, phi)
-#' @param opt.crit Optimization criterion. One of "\link{tau2}" (Tau squared error of the residuals, default), "roblik" (Robust Log-likelihood), "mse" (Mean Square Error), "amse" (Average MSE over first \code{nmse} forecast horizons), "sigma" (Standard deviation of residuals), "mae" (Mean of absolute residuals), or "lik" (Log-likelihood).
+#' @param opt.crit Optimization criterion. One of "roblik" (Robust Log-likelihood, default), "\link{tau2}" (Tau squared error of the residuals), "mse" (Mean Square Error), "amse" (Average MSE over first \code{nmse} forecast horizons), "sigma" (Standard deviation of residuals), "mae" (Mean of absolute residuals), or "lik" (Log-likelihood).
 #' @param bounds Type of parameter space to impose: \code{"usual"} indicates all parameters must lie between specified lower and upper bounds; \code{"admissible"} indicates parameters must lie in the admissible space; \code{"both"} (default) takes the intersection of these regions.
 #' @param ic Information criterion to be used in model selection.
 #' @param use.initial.values If \code{TRUE} (default) and \code{model} is of class \code{"robets"}, then the initial values in the model are also not re-estimated.
@@ -39,7 +39,7 @@
 robets <- function(y, model="ZZZ", damped=NULL,
                 alpha=NULL, beta=NULL, gamma=NULL, phi=NULL, additive.only=FALSE, lambda=NULL,
                 lower=c(rep(0.0001,3), 0.8), upper=c(rep(0.9999,3),0.98),
-                opt.crit=c("tau2","roblik","lik","mse","amse","sigma","mae"), bounds=c("both","usual","admissible"),
+                opt.crit=c("roblik","tau2","lik","mse","amse","sigma","mae"), bounds=c("both","usual","admissible"),
                 ic=c("robaicc","robaic","robbic","aicc","bic","aic"), 
                 use.initial.values=TRUE,opt.initial.values=FALSE,rob.start.initial.values=TRUE,opt.sigma0=FALSE,k=3,nmse=1,...)
 {
