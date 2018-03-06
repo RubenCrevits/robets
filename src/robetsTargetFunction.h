@@ -73,7 +73,6 @@ private:
   double k;
 
 	std::vector<double> e;
-	std::vector<double> e2;
 	std::vector<double> amse;
 
 	double lik, objval;

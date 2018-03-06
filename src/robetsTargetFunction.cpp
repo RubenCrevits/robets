@@ -87,7 +87,6 @@ void RobetsTargetFunction::init(std::vector<double> & p_y, int p_errortype,
 	//	for(int i=0; i < n; i++) this->e.push_back(0);
 	this->amse.resize(30, 0);
 	this->e.resize(n, 0);
-	this->e2.resize(n-m+1, 0);
 
 }
 
@@ -330,6 +329,7 @@ bool RobetsTargetFunction::admissible() {
 void RobetsTargetFunction::robetscalc(){
   int i, j, maxvalue;
   double oldsigma, sigma, oldl, l, oldb, b, olds[24], s[24], f[30], lik2, tmp, ydown;
+  std::vector<double> absYpred;
     
   if((m > 24) & (seasontype > NONE)){
     return;
@@ -355,6 +355,8 @@ void RobetsTargetFunction::robetscalc(){
   }
   lik = 0.0;
   lik2 = 0.0;
+  
+  
   for(j=0; j<nmse; j++){
     amse[j] = 0.0;
   }
@@ -375,6 +377,8 @@ void RobetsTargetFunction::robetscalc(){
         // ONE STEP FORECAST
         forecast(oldl, oldb, olds, f, maxvalue);
         
+        absYpred.push_back(std::abs(f[0]));
+        
         if(fabs(f[0]-NA) < TOL){
             lik = NA;
             return;
@@ -392,14 +396,6 @@ void RobetsTargetFunction::robetscalc(){
                 amse[j] += (tmp*tmp)/n;
             }
         } 
-        
-        if(i<n-m+1){
-          if(errortype == ADD)
-            e2[i] = y[i+m-1] - f[m-1];
-          else
-            e2[i] = (y[i+m-1]- f[m-1])/f[m-1];
-        }
-        
         
           // ROBUSTNESS STEP
         sigma = std::sqrt( LAMBDA_SIGMA*rhobiweight(e[i]/oldsigma)*oldsigma*oldsigma + (1.0-LAMBDA_SIGMA)*oldsigma*oldsigma); 
@@ -438,23 +434,20 @@ void RobetsTargetFunction::robetscalc(){
     //char c[10];
     //sprintf(c,"%lf",lik);
     //Rprintf("%s ",c);
-    
     lik = n * log(lik);
     //sprintf(c,"%lf",lik);
     //Rprintf("%s ",c);
     if(errortype == MULT)
-        lik += 2*lik2;
+      lik += 2*lik2;
     //sprintf(c,"%lf",lik2);
     //Rprintf("%s | ",c);
     
     if(errortype == ADD){
       tau2 = computeTau2(e);
       roblik = n*log(n*tau2); 
-      tau2 = 0.5*tau2 + 0.5*computeTau2(e2);
     }else{ // errortype = MULT
       tau2 = computeTau2(e); 
-      roblik = n*log(n*tau2)+2*lik2; 
-      tau2 = 0.5*tau2 + 0.5*computeTau2(e2);
+      roblik = n*log(n*tau2)+2*n*log(median(absYpred));  //  n*log(n*tau2)+2*lik2;  // 
     }
 
 }
@@ -595,7 +588,6 @@ void RobetsTargetFunction::oneEval(std::vector<double> & p_y, int p_errortype,
         
     this->amse.resize(30, 0);
     this->e.resize(n, 0);
-    this->e2.resize(n-m+1, 0);
 
 	this->state.clear();
 
@@ -657,7 +649,7 @@ double RobetsTargetFunction::median(std::vector<double> x) {
 
 double RobetsTargetFunction::computeTau2(std::vector<double>& x){
   // compute Erho
-  const double kt = 3.0;//2.0;
+  const double kt = 3.0;//2.0; 
   const double dnormk = R::dnorm(kt, 0.0, 1.0, 0); //exp(-kt*kt/2.0)/sqrt(2.0*M_PI);
   const double pnormk = R::pnorm(kt, 0.0, 1.0, 1, 0); //0.5*erfc(-kt/sqrt(2.0));
   const double d1 = pnormk-0.5-kt*dnormk;
